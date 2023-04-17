@@ -1,0 +1,32 @@
+﻿@model Project.domain.models.EventPicture
+
+@{
+    ViewData["Title"] = "Picture";
+}
+
+
+<h1>Event Picture</h1>
+<hr />@*asp-route-id="@Model.UniId"*@
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Picture" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <input type="hidden" name="_EId" value="@Model.EId" />
+            <div class="form-group">
+                <input type="file" name="myfiles" multiple />
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

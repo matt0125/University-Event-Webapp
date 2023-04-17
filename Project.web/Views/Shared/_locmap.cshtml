@@ -1,0 +1,103 @@
+﻿@model LocationLists
+@{
+    ViewBag.Title = "Home Page";
+}
+<script type='text/javascript'>
+    function loadMapScenario() {
+        var map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
+            credentials: 'AozbavhS6vCwM5Bx85bmJqBFQiCLbx5vR3cwv7YbDKjS0abkMQB15QRE7E1b42PJ',
+            mapTypeId: Microsoft.Maps.MapTypeId.road,
+            zoom: 5
+        });
+        
+        // Create the infobox for the pushpin
+        var infobox = null;
+
+        //declare addMarker function
+        function addMarker(latitude, longitude, title, description, pid) {
+            var marker = new Microsoft.Maps.Pushpin(new Microsoft.Maps.Location(latitude, longitude), { color: 'green' });
+
+            infobox = new Microsoft.Maps.Infobox(marker.getLocation(), {
+                visible: false
+            });
+
+            marker.metadata = {
+                id: pid,
+                title: title,
+                description: description
+            };
+
+           
+            Microsoft.Maps.Events.addHandler(map, 'click', setLocation);
+            Microsoft.Maps.Events.addHandler(marker, 'mouseout', hideInfobox);
+            Microsoft.Maps.Events.addHandler(marker, 'mouseover', showInfobox);
+         
+            infobox.setMap(map);
+            map.entities.push(marker);
+            marker.setOptions({ enableHoverStyle: true });
+        };
+        function showInfobox(e) {
+            if (e.target.metadata) {
+                infobox.setOptions({
+                    location: e.target.getLocation(),
+                    title: e.target.metadata.title,
+                    description: e.target.metadata.description,
+                    visible: true
+                });
+            }
+        }
+        function setLocation(e) {
+                var point = new Microsoft.Maps.Point(e.getX(), e.getY());
+                var loc = e.target.tryPixelToLocation(point);
+
+                // get the latitude and longitude coordinates of the clicked location
+                var lat = loc.latitude.toFixed(4);
+                var lon = loc.longitude.toFixed(4);
+
+                // display the latitude and longitude coordinates in an alert dialog
+                alert('You clicked at latitude ' + lat + ' and longitude ' + lon);
+
+                document.getElementById("lattitude").value = e.location.latitude;
+                document.getElementById("longitude").value = e.location.longitude;
+
+                document.getElementById("Lattitude").value = e.location.latitude;
+                document.getElementById("Longitude").value = e.location.longitude;
+        }
+        function showInfobox(e) {
+            if (e.target.metadata) {
+                infobox.setOptions({
+                    location: e.target.getLocation(),
+                    title: e.target.metadata.title,
+                    description: e.target.metadata.description,
+                    visible: true
+                });
+            }
+        }
+
+        function hideInfobox(e) {
+            infobox.setOptions({ visible: false });
+        }
+
+        //add markers to map
+    @if (Model.LocationList != null)
+    {
+        foreach (var item in Model.LocationList)
+        {
+            @:addMarker(@item.Latitude, @item.Longitude, '@item.Title', '@item.Description', '@item.LocationId');
+        }
+    }
+}
+
+
+</script>
+<script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?branch=release&callback=loadMapScenario' async defer></script>
+
+<div class="jumbotron">
+    <h2>Map</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-12 map">
+        <div id="myMap" style="width:100%; height:610px;"></div>
+    </div>
+</div>  

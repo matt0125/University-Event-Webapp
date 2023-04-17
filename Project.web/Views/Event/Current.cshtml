@@ -1,0 +1,42 @@
+﻿@model List<Event>
+@{
+
+    var events = Model.GroupBy(x => new { x.Visibility });
+}
+
+<a asp-action="Search" class="btn btn-outline-secondary">Search For Events</a>
+
+<br />
+<br />
+@foreach (var eventName in events)
+{
+    <h4>@eventName.Key.Visibility Events</h4>
+
+    @foreach (Event item in Model.Where(x => x.Visibility == eventName.Key.Visibility))
+    {
+        <partial name="_Event" model="@item" />
+    }
+    <hr />
+}
+
+
+<!-- Include jQuery and Bootstrap 5 JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function toggleForm(formId) {
+       
+        var form = document.getElementById(formId + '-form');
+        if (form.style.display === "none") {
+            form.style.display = "block";
+        } else {
+            form.style.display = "none";
+        }
+
+        var form2 = document.getElementById(formId + '-button');
+        if (form2.style.display === "none") {
+            form2.style.display = "block";
+        } else {
+            form2.style.display = "none";
+        }
+    }
+</script>

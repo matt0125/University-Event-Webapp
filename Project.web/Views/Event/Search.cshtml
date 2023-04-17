@@ -1,0 +1,103 @@
+﻿@model IEnumerable<Project.domain.models.Event>
+
+@{
+    ViewData["Title"] = "Search";
+}
+
+<h1>Search</h1>
+
+<form asp-action="Search" method="get" class="row">
+    <div class="col-md-2">
+        <label name="vis" class="control-label">Visibility</label>
+        <select name="vis" class="form-control" asp-items="ViewBag.Visabilities"></select>
+    </div>
+    <div class="col-md-3">
+        <label name="CId" class="control-label">Catagory</label>
+        <select name="CId" class="form-control" asp-items="ViewBag.Catagories"></select>
+    </div>
+    <div class="col-md-3">
+        <label name="lID" class="control-label">Location</label>
+        <select name="lID" class="form-control" asp-items="ViewBag.LocationId"></select>
+    </div>
+    <div class="col-md-3">
+        <label name="name" class="control-label">Name</label>
+        <input name="name" class="form-control" type="text"></input>
+    </div>
+    <div class="col-md-1">
+        <br />
+        <input type="submit" value="Search" class="btn btn-primary" />
+    </div>
+</form>
+<br />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CIdNavigation.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Visibility)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StartTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EndTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Location)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rso)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CIdNavigation.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Visibility)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StartTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EndTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Location.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Rso.Name)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.EId" title="Details"><i class="fa-solid fa-circle-info"></i></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

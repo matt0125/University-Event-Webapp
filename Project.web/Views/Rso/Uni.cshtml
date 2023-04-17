@@ -1,0 +1,25 @@
+﻿@model RSOMemberManage
+
+@{
+
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+    <div>
+        @if(Model.RSOs.Count == 0)
+        {
+            <h4>Uh oh!</h4>
+            <p>It looks like there aren't any currently approved RSO's for your University. Try getting together with some other students and create one now!</p>
+        }
+       <partial name="_RSO" model="@Model" />
+       
+    </div>
+</body>
+</html>

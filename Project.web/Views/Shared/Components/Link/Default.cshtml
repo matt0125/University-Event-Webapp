@@ -1,0 +1,83 @@
+﻿@model LinkVM
+
+
+<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+    <div class="container-fluid">
+
+        @if (Model.User.IsStudent || Model.User.IsSuperAdmin || Model.User.IsAdmin)
+        {
+            <a class="navbar-brand" asp-area="" asp-route-id="@Model.University.UniId" asp-controller="Universities" asp-action="Home">@Model.University.Name</a>
+        }
+        else
+        {
+            <a class="navbar-brand" asp-area="" asp-controller="Universities" asp-action="Index">Join a University</a>
+        }
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+            <ul class="navbar-nav flex-grow-1">
+
+
+
+                @if (!Model.User.IsStudent)
+                {
+
+                }
+
+                @if (Model.User.IsStudent || Model.User.IsSuperAdmin || Model.User.IsAdmin)
+                {
+                    @if (Model.Invitations > 0)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Notifications"><span class="badge badge-notify"><font color="red">@Model.Invitations</font></span>Invitations</a>
+                        </li>
+                    }
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Event" asp-action="Current">Events</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="RSO" asp-action="Index">RSO</a>
+                    </li>
+                }
+
+                @if (Model.User.IsAdmin || Model.User.IsSuperAdmin)
+                {
+
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Location" asp-action="Index">Location</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Catagory" asp-action="Index">Catagories</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Event" asp-action="Index">Manage Events</a>
+                    </li>
+
+
+
+                }
+                @if (Model.User.IsSuperAdmin)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Universities" asp-action="Index">Universities</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
+                    </li>
+                    @if (Model.Notifications > 0)
+                    {
+                        <li class="nav-item">
+
+                            <a class="nav-link text-dark" asp-area="" asp-controller="SuperAdmin" asp-action="Notifications"><span class="badge badge-notify"><font color="red">@Model.Notifications</font></span>Notifications</a>
+                        </li>
+                    }
+                }
+
+
+            </ul>
+            <partial name="_LoginPartial" />
+        </div>
+    </div>
+</nav>

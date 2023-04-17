@@ -1,0 +1,45 @@
+﻿@model SuperAdminNotifications
+
+<h5>RSO's Peniding Approval:</h5>
+<br />
+@foreach (var item in Model.Rsos)
+{
+    <div class="row">
+        <div class="col-md-2">
+            @item.Name
+        </div>
+        <div class="col-md-4">
+            @item.Description
+        </div>
+        <div class="col-md-1">
+            <a asp-action="ApproveRso" asp-controller="SuperAdmin" asp-route-id="@item.RsoId" class="btn btn-outline-secondary">Approve</a>
+        </div>
+        <div class="col-md-1">
+            <a asp-action="DenyRso" asp-controller="SuperAdmin" asp-route-id="@item.RsoId" class="btn btn-outline-secondary">Deny</a>
+        </div>
+
+    </div>
+}
+    <hr />
+<h5>Event's Peniding Approval:</h5>
+<br />
+
+@foreach (var item in Model.Events)
+{
+
+    <div class="row">
+        <div class="col-md-2">
+            @item.Name
+        </div>
+        <div class="col-md-4">
+            @item.Description
+        </div>
+        <div class="col-md-1">
+            <a asp-action="ApproveEvent" asp-controller="SuperAdmin" asp-route-id="@item.EId" class="btn btn-outline-secondary">Approve</a>
+        </div>
+        <div class="col-md-1">
+            <a asp-action="DenyEvent" class="btn btn-outline-secondary" asp-controller="SuperAdmin" asp-route-id="@item.EId" >Deny</a>
+
+        </div>
+    </div>
+}

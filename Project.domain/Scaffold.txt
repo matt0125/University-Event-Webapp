@@ -1,0 +1,5 @@
+﻿View > Other Windows > Package Manager Console
+
+Scaffold-DbContext -project Project.domain "Server=localhost;Database=Project;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir models -force -contextDir models -context ProjectContext
+
+note, every rescaffold be sure to set User.IsStudent to non-nullable (delete ?)
