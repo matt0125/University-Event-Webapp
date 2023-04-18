@@ -1,48 +1,61 @@
 ﻿@model Project.domain.models.Event
 
-<div class="row">
-    <div class="col-md-4">
+@if (Model.Status == 1)
+{
+    <div class="col-md-6">
         <div class="card">
-            <h5 class="card-header">@Html.DisplayFor(model => model.Name)   
-            @for (int i = 0; i < @Model.Reactions.Average(x => x.Rating); i++)
-            {
-                <i class="fa-solid fa-star" >&nbsp;</i>
-            }
+            <h5 class="card-header">
+                @Html.DisplayFor(model => model.Name)
+                @for (int i = 0; i < @Model.Reactions.Average(x => x.Rating); i++)
+                {
+                    <i class="fa-solid fa-star">&nbsp;</i>
+                }
+                @for (int i = 0; i < 5- @Model.Reactions.Average(x => x.Rating); i++)
+                {
+                    <i class="fa-regular fa-star">&nbsp;</i>
+                }
             </h5>
-           
+
             <div class="card-body">
                 <h5 class="card-title">@Html.DisplayFor(model => model.Description)</h5>
                 <p class="card-text">@Html.ActionLink(Model.Location.Name,"Details","Location", new { id = Model.LocationId })</p>
-            @if (Model.EventPictures.Count(x => x.PId != -1) != 0)
-            {
-                <a asp-action="FullSize" asp-route-id="@Model.EventPictures.FirstOrDefault(x => x.PId != -1).PId"> <img class="img-fluid" src="data:image/jpeg;base64,@(Convert.ToBase64String(Model.EventPictures.FirstOrDefault(x => x.PId != -1).Picture))"></a>
-            }
+                <p class="card-text">From @Html.DisplayFor(model => Model.StartTime) to @Html.DisplayFor(model => Model.EndTime)</p>
+                <p class="card-text"><i class="fa-solid fa-phone"></i> @Html.DisplayFor(model => Model.Phone)</p>
+                <p class="card-text"><i class="fa-solid fa-envelope"></i> @Html.DisplayFor(model => Model.Email)</p>
+                <div style="max-height: 25vh; overflow: hidden; overflow-y: scroll">
+
+                @foreach (EventPicture pic in Model.EventPictures)
+                {
+                    <img class="img-fluid" src="data:image/jpeg;base64,@(Convert.ToBase64String(pic.Picture))">
+                }
+                </div>
                 <div class="container mt-5">
                     @foreach (Reaction item in Model.Reactions.Where(x => !string.IsNullOrEmpty(x.Comment)))
                     {
                         @item.Comment <em>~@item.User.FirstName @item.User.LastName</em>
                         @if (ViewBag.currentuser.UserId == item.UserId)
                         {
-                            <a asp-action="EditComment" asp-controller="Event" asp-route-id="@item.ReactionId" class="btn btn-outline-secondary">Edit</a>
+                            <a asp-action="EditComment" asp-controller="Event" asp-route-id="@item.ReactionId">Edit</a>
+                            <a asp-action="DeleteComment" asp-controller="Event" asp-route-id="@item.ReactionId">Delete</a>
                         }
 
                         <Br />
                     }
-                    <button id="@Model.EId-button" class="btn btn-primary mb-3" onclick="toggleForm('@Model.EId')">Comment</button>
+                    <button id="@Model.EId-button" class="btn btn-primary mb-3" onclick="toggleForm('@Model.EId')">React</button>
                     <form id="@Model.EId-form" method="post" asp-action="Comment" asp-controller="Event" style="display: none;">
                         <input type="hidden" name="Eid" value="@Model.EId" />
                         <div class="mb-3">
                             <strong>Comment</strong>
                             <textarea class="form-control" cols="40" rows="5" name="comment"></textarea>
                         </div>
-                            <div class="mb-3">
-                                <strong>Rating</strong>
+                        <div class="mb-3">
+                            <strong>Rating</strong>
                             <select class="form-control" name="rating">
-                                @for(int i = 1; i <=5; i++)
+                                @for (int i = 1; i <= 5; i++)
                                 {
                                     <option value="@i">@i</option>
                                 }
-                                </select>
+                            </select>
                         </div>
 
                         <button type="submit" class="btn btn-primary">Save</button>
@@ -52,58 +65,5 @@
         </div>
         <br />
     </div>
- @*   <div class="col-md-12">
-    @if (Model.Visibility == "RSO")
-    {
-    @Html.DisplayFor(model => model.Rso.Name)
 
-    }
-
-
-    @if (@Model.Reactions.Count(x => x.Rating != null) != 0)
-    {
-
-    <p>- [@Model.Reactions.Average(x => x.Rating) / 5] </p>
-    }
-
-    <b>@Html.DisplayFor(model => model.Name)</b>
-    -@Html.ActionLink(Model.Location.Name,"Details","Location", new { id = Model.LocationId });
-    <Br />
-    @Html.DisplayFor(model => model.Description)
-    <br />
-    @foreach (Reaction item in Model.Reactions.Where(x => !string.IsNullOrEmpty(x.Comment)))
-    {
-    @item.Comment <em>~@item.User.FirstName @item.User.LastName</em>
-    @if (ViewBag.currentuser.UserId == item.UserId)
-    {
-    <a asp-action="EditComment" asp-controller="Event" asp-route-id="@item.ReactionId" class="btn btn-outline-secondary">Edit</a>
-    }
-
-    <Br />
-    }
-
-
-
-
-
-
-    </div>*@
-</div>
-
-@*<div class="card">
-    <div class="card-header">
-        <strong>@Model.Name</strong><Br />
-        @if (Model.Visibility == "University")
-        {
-            @Html.DisplayFor(model => model.Uni.Name)
-        }
-        @if (Model.Visibility == "RSO")
-        {
-            @Html.DisplayFor(model => model.Rso.Name)
-            <p>This is an rso</p>
-        }
-    </div>
-    <div class="card-body"> @Html.DisplayFor(model => model.Description)</div>
-    <div class="card-footer">@Html.ActionLink(Model.Location.Name,"Details","Location", new { id = Model.LocationId })</b>-@Html.ActionLink(Model.Location.Name,"Details","Location", new { id = Model.LocationId });</div>
-</div>
-<br />*@
+}

@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Index";
+    int userId = (int)ViewData["userid"];
 }
 
 <h1>Index</h1>
@@ -64,12 +65,12 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.EndTime)
                 </td>
-                    @if (item.Status == 0)
-                    {
+                @if (item.Status == 0)
+                {
                     <td>
                         Pending
                     </td>
-                    }
+                }
                 @if (item.Status == 1)
                 {
                     <td>
@@ -89,10 +90,13 @@
                     @Html.DisplayFor(modelItem => item.Rso.Name)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.EId" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a> |
-                    <a asp-action="Details" asp-route-id="@item.EId" title="Details"><i class="fa-solid fa-circle-info"></i></a> |
-                    <a asp-action="Picture" asp-route-id="@item.EId" title="Pciture">Add Image</a> |
-                    <a asp-action="Delete" asp-route-id="@item.EId" title="Delete"><i class="fa-solid fa-trash-can"></i></a>
+                    <a asp-action="Details" asp-route-id="@item.EId" title="Details"><i class="fa-solid fa-circle-info"></i></a>
+                    @if (item.Rso != null && item.Rso.CreatedBy == userId)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.EId" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
+                        <a asp-action="Delete" asp-route-id="@item.EId" title="Delete"><i class="fa-solid fa-trash-can"></i></a>
+                        <a asp-action="Picture" asp-route-id="@item.EId" title="Pciture"><i class="fa-solid fa-camera"></i></a>
+                    }
                 </td>
             </tr>
         }

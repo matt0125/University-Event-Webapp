@@ -10,21 +10,25 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Project.domain.models;
+using Project.domain.Models;
+using Project.web.Models;
 
 namespace Project.web.Controllers
 {
     public class UniversitiesController : Controller
     {
         private readonly ProjectContext _context;
+        private readonly CombinedUser _currentUser;
 
-        public UniversitiesController(ProjectContext context)
+        public UniversitiesController(ProjectContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _currentUser = _context.CombinedUsers.FirstOrDefault(x => x.UserName == httpContextAccessor.HttpContext.User.Identity.Name);
         }
 
         private void SetupForm(University university = null)
         {
-            var names = _context.Users.Select(x => new { UserId = x.UserId, Name = $"{x.FirstName} {x.LastName}"}).ToList();
+            var names = _context.Users.Select(x => new { UserId = x.UserId, Name = $"{x.FirstName} {x.LastName}" }).ToList();
             ViewData["CreatedBy"] = new SelectList(names, "UserId", "Name", university?.CreatedBy);
             ViewData["LocationId"] = new SelectList(_context.Locations, "LocationId", "Name", university?.LocationId);
         }
@@ -64,20 +68,42 @@ namespace Project.web.Controllers
             {
                 return NotFound();
             }
-
+            ViewData["currentuser"] = _currentUser;
             var university = await _context.Universities
                 .Include(u => u.CreatedByNavigation)
                 .Include(u => u.Location)
                 .Include(u => u.UniPictures)
-                .Include(u => u.Events).ThenInclude(u => u.Location)
+                .Include(u => u.Events).ThenInclude(x => x.EventPictures)
+                .Include(x => x.Events).ThenInclude(u => u.Location)
+                .Include(x => x.Events).ThenInclude(u => u.Reactions)
                 .Include(u => u.Rsos)
+                
                 .FirstOrDefaultAsync(m => m.UniId == id);
             if (university == null)
             {
                 return NotFound();
             }
+            RSOUniVM model = new RSOUniVM(university);
 
-            return View(university);
+            RSOMemberManage rso = new RSOMemberManage();
+            rso.User = _currentUser;
+
+
+            if (rso.User == null)
+            {
+                rso.User = new CombinedUser { IsAdmin = false, IsStudent = false, IsSuperAdmin = false };
+                return View(model);
+            }
+
+
+            University _university = _context.Universities.FirstOrDefault(x => x.UniId == rso.User.UniId);
+
+
+            rso.RSOs = await _context.Rsos.Where(r => r.Status == 2 && r.UniId == _university.UniId).Include(r => r.RsoMembers).Include(r => r.CreatedByNavigation).Include(r => r.Uni).ToListAsync();
+
+            model.RSO = rso;
+
+            return View(model);
         }
 
 
@@ -101,9 +127,9 @@ namespace Project.web.Controllers
             User user1 = await _context.Users.FirstOrDefaultAsync(x => x.AspNetUserId == user.Id);
 
             university.CreatedBy = user1.UserId;
-                _context.Add(university);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+            _context.Add(university);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
             ViewData["CreatedBy"] = new SelectList(_context.Users, "UserId", "AspNetUserId", university.CreatedBy);
             ViewData["LocationId"] = new SelectList(_context.Locations, "LocationId", "Name", university.LocationId);
             return View(university);
@@ -132,7 +158,7 @@ namespace Project.web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id,  University university)
+        public async Task<IActionResult> Edit(int id, University university)
         {
             if (id != university.UniId)
             {
@@ -226,14 +252,14 @@ namespace Project.web.Controllers
             {
                 _context.Universities.Remove(university);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool UniversityExists(int id)
         {
-          return (_context.Universities?.Any(e => e.UniId == id)).GetValueOrDefault();
+            return (_context.Universities?.Any(e => e.UniId == id)).GetValueOrDefault();
         }
     }
 }

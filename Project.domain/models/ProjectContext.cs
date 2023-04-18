@@ -199,6 +199,12 @@ namespace Project.domain.models
 
                 entity.ToTable("Event");
 
+                entity.HasIndex(e => e.CId, "IX_Event_Catagory");
+
+                entity.HasIndex(e => e.Name, "IX_Event_Name");
+
+                entity.HasIndex(e => e.UniId, "IX_Event_Uni");
+
                 entity.Property(e => e.EId).HasColumnName("e_id");
 
                 entity.Property(e => e.CId).HasColumnName("c_id");
@@ -416,7 +422,7 @@ namespace Project.domain.models
 
                 entity.ToView("RSOEvents");
 
-                entity.Property(e => e.Category).HasColumnName("category");
+                entity.Property(e => e.CId).HasColumnName("c_id");
 
                 entity.Property(e => e.Description)
                     .HasMaxLength(5000)
@@ -425,14 +431,14 @@ namespace Project.domain.models
 
                 entity.Property(e => e.EId).HasColumnName("e_id");
 
+                entity.Property(e => e.Email)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("email");
+
                 entity.Property(e => e.EndTime)
                     .HasColumnType("datetime")
                     .HasColumnName("end_time");
-
-                entity.Property(e => e.Expr2)
-                    .HasMaxLength(30)
-                    .IsUnicode(false)
-                    .IsFixedLength();
 
                 entity.Property(e => e.IsAdmin).HasColumnName("is_admin");
 
@@ -444,7 +450,18 @@ namespace Project.domain.models
                     .HasColumnName("name")
                     .IsFixedLength();
 
+                entity.Property(e => e.Phone)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("phone");
+
                 entity.Property(e => e.RsoId).HasColumnName("rso_id");
+
+                entity.Property(e => e.RsoName)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("rso_name")
+                    .IsFixedLength();
 
                 entity.Property(e => e.StartTime)
                     .HasColumnType("datetime")
@@ -454,7 +471,10 @@ namespace Project.domain.models
 
                 entity.Property(e => e.UserId).HasColumnName("user_id");
 
-                entity.Property(e => e.Visibility).HasColumnName("visibility");
+                entity.Property(e => e.Visibility)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("visibility");
             });
 
             modelBuilder.Entity<UniPicture>(entity =>
@@ -516,6 +536,8 @@ namespace Project.domain.models
             modelBuilder.Entity<User>(entity =>
             {
                 entity.ToTable("User");
+
+                entity.HasIndex(e => e.UniId, "IX_User");
 
                 entity.Property(e => e.UserId).HasColumnName("user_id");
 

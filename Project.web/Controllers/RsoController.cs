@@ -29,14 +29,18 @@ public class RsoController : Controller
     {
         List<StatusText> statusTexts = StatusTexts();
 
-        List<Rso> projectContext = await _context.Rsos.Include(r => r.CreatedByNavigation).Include(r => r.Uni).ToListAsync();
+        List<Rso> projectContext = await _context.Rsos.Where(r => r.UniId == _currentUser.UniId).Include(r => r.RsoMembers).Include(r => r.CreatedByNavigation).Include(r => r.Uni).ToListAsync();
 
         foreach (Rso rso in projectContext)
         {
             rso.Statusi = statusTexts;
         }
+
+        RSOMemberManage model = new RSOMemberManage();
+        model.RSOs = projectContext;
+        model.User = _currentUser;
         
-        return View(projectContext);
+        return View(model);
     }
 
     public async Task<IActionResult> Uni()
@@ -87,17 +91,23 @@ public class RsoController : Controller
         model.User = _context.CombinedUsers.FirstOrDefault(x => x.UserName == HttpContext.User.Identity.Name);
 
         newMember.UserId = model.User.UserId;
+        
+        RsoMember existingmember = _context.RsoMembers.FirstOrDefault(x => x.UserId == newMember.UserId && x.RsoId == id);
 
-        if(_context.RsoMembers.FirstOrDefault(x => x.UserId == newMember.UserId && x.RsoId == id) != null)
+        if (existingmember != null)
         {
-            _context.RsoMembers.FirstOrDefault(x => x.UserId == newMember.UserId && x.RsoId == id).Status = 1;
+            existingmember.Status = 1;
+            _context.RsoMembers.Update(existingmember);
             await _context.SaveChangesAsync();
             return Redirect(Request.Headers["Referer"].ToString());
 
         }
 
-        _context.Add(newMember);
+        _context.RsoMembers.Add(newMember);
         await _context.SaveChangesAsync();
+
+        //_context.RsoMembers.Update(newMember);
+        //await _context.SaveChangesAsync();
 
 
         return Redirect(Request.Headers["Referer"].ToString());
@@ -182,11 +192,17 @@ public class RsoController : Controller
             newRso.Description = rso.Description;
 
             _context.Add(newRso);
+            await _context.SaveChangesAsync();
+
             newRso.RsoMembers.Add(new RsoMember { UserId = rso.User1 });
+            await _context.SaveChangesAsync();
             newRso.RsoMembers.Add(new RsoMember { UserId = rso.User2 });
+            await _context.SaveChangesAsync();
             newRso.RsoMembers.Add(new RsoMember { UserId = rso.User3 });
+            await _context.SaveChangesAsync();
             newRso.RsoMembers.Add(new RsoMember { UserId = rso.User4 });
-            newRso.RsoMembers.Add(new RsoMember { UserId = _currentUser.UserId, IsAdmin = true, Status = 2 });
+            await _context.SaveChangesAsync();
+            newRso.RsoMembers.Add(new RsoMember { UserId = _currentUser.UserId, IsAdmin = true, Status = 1 });
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

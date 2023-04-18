@@ -41,7 +41,7 @@ namespace Project.web.Controllers
                 notices += _context.Events.Where(x => x.Status == 0 && x.UniId == model.University.UniId).Count();
 
                 model.Notifications = notices;
-
+                
                 model.Invitations = _context.RsoMembers.Where(x => x.Status == 0 && x.UserId == model.User.UserId).Count();
                 return View(model);
             }

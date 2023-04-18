@@ -1,7 +1,7 @@
-﻿@model IEnumerable<Project.domain.models.Rso>
+﻿@model RSOMemberManage
 
 @{
-    
+
 }
 
 <!DOCTYPE html>
@@ -12,51 +12,70 @@
     <title>Index</title>
 </head>
 <body>
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                Created By
-            </th>
-            <th>
-                University
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @*@item.Statusi.FirstOrDefault(x => x.ID == item.Status).Text*@
-                @item.StatusText
-            </td>
-            <td>
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Status
+                </th>
+                <th>
+                    Created By
+                </th>
+                <th>
+                    University
+                </th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.RSOs)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @*@item.Statusi.FirstOrDefault(x => x.ID == item.Status).Text*@
+                        @item.StatusText
+                    </td>
+                    <td>
                         @item.CreatedByNavigation.FirstName @item.CreatedByNavigation.LastName
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Uni.Description)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.RsoId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.RsoId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.RsoId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Uni.Description)
+                    </td>
+                    <td>
+                        @if (item.RsoMembers.Any(x => x.UserId == Model.User.UserId))
+                        {
+                            <a asp-action="Leave" asp-controller="Rso" asp-route-id="@item.RsoId" class="btn btn-outline-danger" title="Leave @item.Name">Leave</a>
+                        }
+                        else
+                        {
+                            <a asp-action="Join" asp-controller="Rso" asp-route-id="@item.RsoId" class="btn btn-outline-success" title="Join @item.Name"> Join .</a>
+                        }
+                    </td>
+                    <td>
+                        <p>
+
+                            <a asp-action="Details" asp-route-id="@item.RsoId"><i class="fa-solid fa-circle-info"></i></a>
+                            @if (item.CreatedBy == Model.User.UserId)
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.RsoId"><i class="fa-solid fa-pen-to-square"></i></a>
+
+                                <a asp-action="Delete" asp-route-id="@item.RsoId"><i class="fa-solid fa-trash-can"></i></a>
+                            }
+                        </p>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </body>
 </html>

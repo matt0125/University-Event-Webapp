@@ -86,7 +86,18 @@
                     @Html.DisplayFor(modelItem => item.EndTime)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Status)
+                    @if(item.Status == 0)
+                    {
+                        <p>Pending</p>
+                    }
+                    @if (item.Status == 1)
+                    {
+                        <p>Approved</p>
+                    }
+                    @if (item.Status == 2)
+                    {
+                        <p>Denied</p>
+                    }
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Location.Name)

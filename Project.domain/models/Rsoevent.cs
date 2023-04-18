@@ -7,17 +7,18 @@ namespace Project.domain.models
     {
         public int UserId { get; set; }
         public bool IsAdmin { get; set; }
-        public string Expr2 { get; set; } = null!;
-        public int Expr3 { get; set; }
+        public string RsoName { get; set; } = null!;
         public int EId { get; set; }
         public int LocationId { get; set; }
-        public int? RsoId { get; set; }
         public string Name { get; set; } = null!;
-        public float Category { get; set; }
-        public int Visibility { get; set; }
+        public int CId { get; set; }
+        public string Visibility { get; set; } = null!;
         public string Description { get; set; } = null!;
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public byte Status { get; set; }
+        public string Phone { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public int RsoId { get; set; }
     }
 }

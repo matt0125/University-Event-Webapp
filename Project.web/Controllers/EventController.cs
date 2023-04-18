@@ -35,6 +35,7 @@ namespace Project.web.Controllers
                     .Include(x => x.Uni)
                    .Include(x => x.Rso)
                    .ToListAsync();
+            ViewData["userid"] = _user.UserId;
             return View(currentevents);
         }
 
@@ -153,16 +154,55 @@ namespace Project.web.Controllers
         public async Task<IActionResult> Current()
         {
             ViewData["currentuser"] = _user;
-            List<Event> currentevents = await _context.Events.
-                AsNoTracking()
+
+            EventsAndUser model = new EventsAndUser();
+
+
+            List<Event> publicEvents = await _context.Events.
+                AsNoTracking().Where(x => x.Visibility == "Public")
                 .Include(x => x.EventPictures)
                 .Include(x => x.CIdNavigation)
                 .Include(x => x.Location)
-                .Include(x => x.Uni)
-                .Include(x => x.Rso)
                 .Include(x => x.Reactions).ThenInclude(x => x.User)
                 .ToListAsync();
-            return View(currentevents);
+
+            List<Event> uniEvents = await _context.Events
+                .AsNoTracking().Where(x => x.Visibility == "University")
+                .Include(x => x.EventPictures)
+                .Include(x => x.CIdNavigation)
+                .Include(x => x.Location)
+                .Include(x => x.Uni).Where(x => x.UniId == _user.UniId)
+                .Include(x => x.Reactions).ThenInclude(x => x.User)
+                .ToListAsync();
+
+
+            List<Event> rsoEvents = await _context.Events.
+                AsNoTracking().Where(x => x.Visibility == "RSO")
+                .Include(x => x.Rso).ThenInclude(x => x.RsoMembers)
+                .Include(x => x.EventPictures)
+                .Include(x => x.CIdNavigation)
+                .Include(x => x.Location)
+                .Include(x => x.Reactions).ThenInclude(x => x.User)
+                .ToListAsync();
+
+            //List<Rsoevent> rsoEvents = await _context.Rsoevents.AsNoTracking()
+            //    .Where(x => x.UserId == _user.UserId)
+            //    .Include(x => x.EventPictures)
+            //    .Include(x => x.CIdNavigation)
+            //    .Include(x => x.Location)
+            //    .Include(x => x.Reactions).ThenInclude(x => x.User)
+            //    .ToListAsync();
+
+            List<Event> es = await _context.Events.Include(x => x.Rso)
+                .ThenInclude(x => x.RsoMembers).ToListAsync();
+            
+            model.publicEvents = publicEvents;
+            model.uniEvents = uniEvents;
+            model.rsoEvents = rsoEvents;
+            model.userId = _user.UserId;
+
+
+            return View(model);
         }
 
         // GET: Event/Details/5
@@ -223,10 +263,10 @@ namespace Project.web.Controllers
             try
             {
                 if (_context.Events.Where(e => e.LocationId == @event.LocationId)
-                    .Where(e => (e.StartTime > @event.StartTime && e.StartTime < @event.EndTime) ||
-                    (e.EndTime > @event.StartTime && e.EndTime < @event.EndTime) ||
-                    (e.StartTime < @event.StartTime && e.EndTime > @event.StartTime) ||
-                    (e.StartTime < @event.EndTime && e.EndTime > @event.EndTime))
+                    .Where(e => (e.StartTime >= @event.StartTime && e.StartTime <= @event.EndTime) ||
+                    (e.EndTime >= @event.StartTime && e.EndTime <= @event.EndTime) ||
+                    (e.StartTime <= @event.StartTime && e.EndTime >= @event.StartTime) ||
+                    (e.StartTime <= @event.EndTime && e.EndTime >= @event.EndTime))
                     .Count() == 0)
                 {
                     if (@event.LocationId == 0)
@@ -237,12 +277,26 @@ namespace Project.web.Controllers
                         return View(@event);
                     }
                     @event.UniId = _user.UniId;
+                    if( @event.Visibility == "RSO" )
+                    {
+                        @event.Status = 1;
+                    }
                     _context.Add(@event);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
                 }
                 ModelState.Clear();
-                ModelState.AddModelError("GeneralError", "Timefram overlaps with other event(s) for location selected");
+                string location = _context.Events.Where(e => e.LocationId == @event.LocationId)
+                    .FirstOrDefault(e => (e.StartTime >= @event.StartTime && e.StartTime <= @event.EndTime) ||
+                    (e.EndTime >= @event.StartTime && e.EndTime <= @event.EndTime) ||
+                    (e.StartTime <= @event.StartTime && e.EndTime >= @event.StartTime) ||
+                    (e.StartTime <= @event.EndTime && e.EndTime >= @event.EndTime)).Location.Name;
+                string eventName = _context.Events.Where(e => e.LocationId == @event.LocationId)
+                    .FirstOrDefault(e => (e.StartTime >= @event.StartTime && e.StartTime <= @event.EndTime) ||
+                    (e.EndTime >= @event.StartTime && e.EndTime <= @event.EndTime) ||
+                    (e.StartTime <= @event.StartTime && e.EndTime >= @event.StartTime) ||
+                    (e.StartTime <= @event.EndTime && e.EndTime >= @event.EndTime)).Name;
+                ModelState.AddModelError("GeneralError", "Timeframe overlaps with event \"" + eventName + "\" at location \"" + location + "\". Please pick another time or try a different location");
             }
             catch (Exception ex)
             {
@@ -301,7 +355,7 @@ namespace Project.web.Controllers
             string? comment = Request.Form["comment"];
             string? rating = Request.Form["rating"];
 
-            if (!string.IsNullOrEmpty(eid) && !string.IsNullOrEmpty(comment))
+            if (!string.IsNullOrEmpty(eid) && (!string.IsNullOrEmpty(comment) || !string.IsNullOrEmpty(rating)))
             {
                 Reaction rec = new Reaction();
                 rec.Comment = comment;
@@ -314,8 +368,17 @@ namespace Project.web.Controllers
             }
 
             return RedirectToAction(nameof(Current));
-          
+
         }
+
+        public IActionResult DeleteComment(int id)
+        {
+            Reaction rec = _context.Reactions.FirstOrDefault(x => x.ReactionId == id);
+            rec.Comment = null;
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Current));
+        }
+
         public IActionResult EditComment(int id)
         {
             Reaction rec = _context.Reactions.FirstOrDefault(x => x.ReactionId == id);
@@ -324,9 +387,9 @@ namespace Project.web.Controllers
         [HttpPost]
         public IActionResult EditComment(Reaction rec)
         {
-                _context.Reactions.Update(rec);
-                _context.SaveChanges();
-            
+            _context.Reactions.Update(rec);
+            _context.SaveChanges();
+
             return RedirectToAction(nameof(Current));
 
         }

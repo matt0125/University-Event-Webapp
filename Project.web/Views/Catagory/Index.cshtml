@@ -34,9 +34,8 @@
                 @Html.DisplayFor(modelItem => item.Entered)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.CId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.CId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.CId">Delete</a>
+                        <a asp-action="Edit" asp-route-id="@item.CId"><i class="fa-solid fa-pen-to-square"></i></a>
+                        <a asp-action="Details" asp-route-id="@item.CId"><i class="fa-solid fa-circle-info"></i></a>
             </td>
         </tr>
 }

@@ -1,30 +1,149 @@
-﻿@model List<Event>
+﻿@model EventsAndUser
 @{
 
-    var events = Model.GroupBy(x => new { x.Visibility });
+    //var events = Model.GroupBy(x => new { x.Visibility });
 }
 
 <a asp-action="Search" class="btn btn-outline-secondary">Search For Events</a>
 
 <br />
 <br />
-@foreach (var eventName in events)
+@*@foreach (var eventName in events)
 {
     <h4>@eventName.Key.Visibility Events</h4>
+    <div style="max-height: 41vh; overflow: hidden; overflow-y: scroll">
+        <div class="row">
+            @foreach (Event item in Model.Where(x => x.Visibility == eventName.Key.Visibility))
+            {
+                <partial name="_Event" model="@item" />
+            }
+            @if (Model.Where(x => x.Visibility == eventName.Key.Visibility) == null)
+            {
+                <h4>Uh oh!</h4>
+                <p>It looks like there aren't any current events here. Try getting together with some other students and create one now!</p>
+            }
+        </div>
+    </div>
 
-    @foreach (Event item in Model.Where(x => x.Visibility == eventName.Key.Visibility))
-    {
-        <partial name="_Event" model="@item" />
-    }
+
     <hr />
-}
+}*@
+
+<h4>Public Events</h4>
+<div style="max-height: 41vh; overflow: hidden; overflow-y: scroll">
+    <div class="row">
+        @foreach (Event item in Model.publicEvents)
+        {
+            <partial name="_Event" model="@item" />
+        }
+        @if (Model.publicEvents.Count == 0)
+        {
+            <h4>Uh oh!</h4>
+            <p>It looks like there aren't any current events here. Try getting together with some other students and create one now!</p>
+        }
+    </div>
+</div>
+
+
+<hr />
+
+<h4>University Events</h4>
+<div style="max-height: 41vh; overflow: hidden; overflow-y: scroll">
+    <div class="row">
+        @foreach (Event item in Model.uniEvents)
+        {
+            <partial name="_Event" model="@item" />
+        }
+        @if (Model.uniEvents.Count == 0)
+        {
+            <h4>Uh oh!</h4>
+            <p>It looks like there aren't any current events here. Try getting together with some other students and create one now!</p>
+        }
+    </div>
+</div>
+
+<hr />
+
+<h4>Your RSO Events</h4>
+<div style="max-height: 41vh; overflow: hidden; overflow-y: scroll">
+    <div class="row">
+        @foreach (Event item in Model.rsoEvents)
+        {
+            if (item.Rso.RsoMembers.FirstOrDefault(x => x.UserId == Model.userId) != null)
+            {
+                <div class="col-md-6">
+                    <div class="card">
+                        <h5 class="card-header">
+                            @Html.DisplayFor(model => item.Name)
+                            @for (int i = 0; i < @item.Reactions.Average(x => x.Rating); i++)
+                            {
+                                <i class="fa-solid fa-star">&nbsp;</i>
+                            }
+                        </h5>
+
+                        <div class="card-body">
+                            <h5 class="card-title">@Html.DisplayFor(model => item.Description)</h5>
+                            <p class="card-text">@Html.DisplayFor(model => item.Rso.Name) at @Html.ActionLink(item.Location.Name,"Details","Location", new { id = item.LocationId })</p>
+                            <p class="card-text">From @Html.DisplayFor(model => item.StartTime) to @Html.DisplayFor(model => item.EndTime)</p>
+                            <p class="card-text"><i class="fa-solid fa-phone"></i> @Html.DisplayFor(model => item.Phone)</p>
+                            <p class="card-text"><i class="fa-solid fa-envelope"></i> @Html.DisplayFor(model => item.Email)</p>
+                            @if (item.EventPictures.Count(x => x.PId != -1) != 0)
+                            {
+                                <a asp-action="FullSize" asp-route-id="@item.EventPictures.FirstOrDefault(x => x.PId != -1).PId"> <img class="img-fluid" src="data:image/jpeg;base64,@(Convert.ToBase64String(item.EventPictures.FirstOrDefault(x => x.PId != -1).Picture))"></a>
+                            }
+                            <div class="container mt-5">
+                                @foreach (Reaction other in item.Reactions.Where(x => !string.IsNullOrEmpty(x.Comment)))
+                                {
+                                    @other.Comment <em>~@other.User.FirstName @other.User.LastName</em>
+                                    @if (ViewBag.currentuser.UserId == other.UserId)
+                                    {
+                                        <a asp-action="EditComment" asp-controller="Event" asp-route-id="@other.ReactionId">Edit</a>
+                                        <a asp-action="DeleteComment" asp-controller="Event" asp-route-id="@other.ReactionId">Delete</a>
+                                    }
+
+                                    <Br />
+                                }
+                                <button id="@item.EId-button" class="btn btn-primary mb-3" onclick="toggleForm('@item.EId')">React</button>
+                                <form id="@item.EId-form" method="post" asp-action="Comment" asp-controller="Event" style="display: none;">
+                                    <input type="hidden" name="Eid" value="@item.EId" />
+                                    <div class="mb-3">
+                                        <strong>Comment</strong>
+                                        <textarea class="form-control" cols="40" rows="5" name="comment"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>Rating</strong>
+                                        <select class="form-control" name="rating">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                <option value="@i">@i</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                </div>
+            }
+        }
+        @if (Model.uniEvents.Count == 0)
+        {
+            <h4>Uh oh!</h4>
+            <p>It looks like there aren't any current events here. Try getting together with some other students and create one now!</p>
+        }
+    </div>
+</div>
+
 
 
 <!-- Include jQuery and Bootstrap 5 JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function toggleForm(formId) {
-       
+
         var form = document.getElementById(formId + '-form');
         if (form.style.display === "none") {
             form.style.display = "block";

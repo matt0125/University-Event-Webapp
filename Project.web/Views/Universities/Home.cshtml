@@ -1,52 +1,98 @@
-﻿@model Project.domain.models.University
+﻿@model RSOUniVM
 
 @{
-    ViewData["Title"] = Model.Name;
+    ViewData["Title"] = Model.Uni.Name;
 }
 
-<h1>@Model.Name</h1>
+<h1>@Model.Uni.Name</h1>
 
 <div>
-    <h4>@Html.DisplayFor(model => model.Description)</h4>
+    <h4>@Html.DisplayFor(model => model.Uni.Description)</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
             Students
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.NumStudents)
+            @Html.DisplayFor(model => model.Uni.NumStudents)
         </dd>
         <dt class="col-sm-2">
             Super Admin
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.CreatedByNavigation.FirstName) @Html.DisplayFor(model => model.CreatedByNavigation.LastName)
+            @Html.DisplayFor(model => model.Uni.CreatedByNavigation.FirstName) @Html.DisplayFor(model => model.Uni.CreatedByNavigation.LastName)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Location)
+            @Html.DisplayNameFor(model => model.Uni.Location)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Location.Name)
+            @Html.DisplayFor(model => model.Uni.Location.Name)
         </dd>
     </dl>
 </div>
-<div class="row">
-    @foreach (var item in Model.UniPictures)
-    {
-        <div class="col-md-2">
-            <a asp-action="FullSize" asp-route-id="@item.PId"> <img class="img-fluid" src="data:image/jpeg;base64,@(Convert.ToBase64String(item.Picture))"></a>
-        </div>
-    }
 
-</div>
-
-@foreach (Event item in Model.Events.Where(x => x.Visibility == "University"))
-{
-    <partial name="_Event" model="@item" />
-}
-
-<div class="row">
-    <div class="col-md-6">
-        <a asp-action="uni" class="btn btn-outline-secondary" asp-controller="Rso">Manage your RSO's</a>
+<div style="max-height: 25vh; overflow: hidden; overflow-y: scroll">
+    <div class="row">
+        @foreach (var item in Model.Uni.UniPictures)
+        {
+            <div class="col-md-2">
+                <img class="img-fluid" src="data:image/jpeg;base64,@(Convert.ToBase64String(item.Picture))">
+            </div>
+        }
     </div>
 </div>
+<br />
+<h5>University Events:</h5>
+<hr />
+<div style="max-height: 41vh; overflow: hidden; overflow-y: scroll">
+    <div class="row">
+        @foreach (Event item in Model.Uni.Events.Where(x => x.Visibility == "University"))
+        {
+            <partial name="_Event" model="@item" />
+        }
+    </div>
+</div>
+
+<br />
+<h5>University RSO's:</h5>
+<hr />
+<div style="max-height: 41vh; overflow: hidden; overflow-y: scroll">
+    <div class="row">
+        @if (Model.RSO.RSOs.Count == 0)
+        {
+            <h4>Uh oh!</h4>
+            <p>It looks like there aren't any currently approved RSO's for your University. Try getting together with some other students and create one now!</p>
+        }
+        else
+        {
+            <partial name="_Rso" model="@Model.RSO" />
+        }
+        <div class="col-md-4">
+            <a asp-action="uni" class="btn btn-outline-secondary" asp-controller="Rso">Find RSO's</a>
+            <a asp-action="Create" class="btn btn-outline-secondary" asp-controller="Rso">Create RSO</a>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Include jQuery JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function toggleForm(formId) {
+
+        var form = document.getElementById(formId + '-form');
+        if (form.style.display === "none") {
+            form.style.display = "block";
+        } else {
+            form.style.display = "none";
+        }
+
+        var form2 = document.getElementById(formId + '-button');
+        if (form2.style.display === "none") {
+            form2.style.display = "block";
+        } else {
+            form2.style.display = "none";
+        }
+    }
+</script>
