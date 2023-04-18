@@ -1,21 +1,24 @@
 ﻿CREATE VIEW dbo.RSOEvents
 AS
-SELECT        dbo.[User].user_id, dbo.RSO_Member.is_admin, dbo.RSO.name AS Expr2, dbo.RSO.rso_id AS Expr3, dbo.event.*
+SELECT        dbo.[User].user_id, dbo.RSO_Member.is_admin, dbo.RSO.name AS rso_name, dbo.Event.e_id, dbo.Event.location_id, dbo.Event.name, dbo.Event.c_id, dbo.Event.visibility, dbo.Event.description, dbo.Event.start_time, 
+                         dbo.Event.end_time, dbo.Event.status, dbo.Event.phone, dbo.Event.email, dbo.RSO.rso_id
 FROM            dbo.RSO_Member INNER JOIN
                          dbo.RSO ON dbo.RSO_Member.rso_id = dbo.RSO.rso_id INNER JOIN
                          dbo.[User] ON dbo.RSO_Member.user_id = dbo.[User].user_id INNER JOIN
                          dbo.AspNetUsers ON dbo.[User].AspNetUser_id = dbo.AspNetUsers.Id INNER JOIN
-                         dbo.event ON dbo.RSO.rso_id = dbo.event.rso_id
+                         dbo.Event ON dbo.RSO.rso_id = dbo.Event.rso_id
 GO
 EXECUTE sp_addextendedproperty @name = N'MS_DiagramPaneCount', @value = 2, @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'VIEW', @level1name = N'RSOEvents';
 
 
 GO
-EXECUTE sp_addextendedproperty @name = N'MS_DiagramPane2', @value = N'0
+EXECUTE sp_addextendedproperty @name = N'MS_DiagramPane2', @value = N'50
       End
    End
 End
 ', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'VIEW', @level1name = N'RSOEvents';
+
+
 
 
 GO
@@ -90,6 +93,36 @@ Begin DesignProperties =
          Left = 0
       End
       Begin Tables = 
+         Begin Table = "RSO_Member"
+            Begin Extent = 
+               Top = 182
+               Left = 560
+               Bottom = 342
+               Right = 730
+            End
+            DisplayFlags = 280
+            TopColumn = 0
+         End
+         Begin Table = "RSO"
+            Begin Extent = 
+               Top = 81
+               Left = 882
+               Bottom = 256
+               Right = 1052
+            End
+            DisplayFlags = 280
+            TopColumn = 0
+         End
+         Begin Table = "User"
+            Begin Extent = 
+               Top = 209
+               Left = 306
+               Bottom = 339
+               Right = 476
+            End
+            DisplayFlags = 280
+            TopColumn = 0
+         End
          Begin Table = "AspNetUsers"
             Begin Extent = 
                Top = 39
@@ -100,42 +133,12 @@ Begin DesignProperties =
             DisplayFlags = 280
             TopColumn = 0
          End
-         Begin Table = "User"
+         Begin Table = "Event"
             Begin Extent = 
-               Top = 50
-               Left = 319
-               Bottom = 263
-               Right = 489
-            End
-            DisplayFlags = 280
-            TopColumn = 0
-         End
-         Begin Table = "RSO"
-            Begin Extent = 
-               Top = 44
-               Left = 818
-               Bottom = 219
-               Right = 988
-            End
-            DisplayFlags = 280
-            TopColumn = 0
-         End
-         Begin Table = "RSO_Member"
-            Begin Extent = 
-               Top = 39
-               Left = 567
-               Bottom = 199
-               Right = 737
-            End
-            DisplayFlags = 280
-            TopColumn = 0
-         End
-         Begin Table = "event"
-            Begin Extent = 
-               Top = 40
-               Left = 1060
-               Bottom = 281
-               Right = 1230
+               Top = 12
+               Left = 578
+               Bottom = 142
+               Right = 748
             End
             DisplayFlags = 280
             TopColumn = 0
@@ -162,5 +165,7 @@ Begin DesignProperties =
          Filter = 1350
          Or = 1350
          Or = 1350
-         Or = 135', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'VIEW', @level1name = N'RSOEvents';
+         Or = 13', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'VIEW', @level1name = N'RSOEvents';
+
+
 

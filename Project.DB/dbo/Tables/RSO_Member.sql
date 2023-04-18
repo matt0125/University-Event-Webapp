@@ -5,9 +5,11 @@
     [is_admin]  BIT     CONSTRAINT [DF_RSO_Member_is_admin] DEFAULT ((0)) NOT NULL,
     [status]    TINYINT CONSTRAINT [DF_RSO_Member_status] DEFAULT ((0)) NOT NULL,
     CONSTRAINT [PK_RSO_Member] PRIMARY KEY CLUSTERED ([member_id] ASC),
-    CONSTRAINT [FK_RSO_Member_RSO] FOREIGN KEY ([rso_id]) REFERENCES [dbo].[RSO] ([rso_id]),
+    CONSTRAINT [FK_RSO_Member_RSO] FOREIGN KEY ([rso_id]) REFERENCES [dbo].[RSO] ([rso_id]) ON DELETE CASCADE,
     CONSTRAINT [FK_RSO_Member_User] FOREIGN KEY ([user_id]) REFERENCES [dbo].[User] ([user_id])
 );
+
+
 
 
 
@@ -35,12 +37,18 @@ BEGIN
         WHERE rso_id = (
             SELECT rso_id
             FROM RSO_Member
-			WHERE status = 1
-			AND rso_id = (select rso_id from inserted)
+			WHERE rso_id = (select rso_id from inserted)
             GROUP BY rso_id
             HAVING COUNT(*) >= 5
-        );
-    END
+        )
+		UPDATE [User]
+		SET isAdmin = 1
+		WHERE user_id = (
+		select created_by
+		FROM RSO
+		WHERE rso_id = (select rso_id from inserted)
+		)
+	END
 END
 GO
 -- =============================================

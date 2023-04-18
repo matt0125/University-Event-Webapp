@@ -14,11 +14,12 @@
     [email]       VARCHAR (50)   NOT NULL,
     CONSTRAINT [PK_event_1] PRIMARY KEY CLUSTERED ([e_id] ASC),
     CONSTRAINT [FK_event_Catagory] FOREIGN KEY ([c_id]) REFERENCES [dbo].[Catagory] ([c_id]),
-    CONSTRAINT [FK_event_event] FOREIGN KEY ([e_id]) REFERENCES [dbo].[Event] ([e_id]),
     CONSTRAINT [FK_event_Location] FOREIGN KEY ([location_id]) REFERENCES [dbo].[Location] ([location_id]),
-    CONSTRAINT [FK_event_RSO1] FOREIGN KEY ([rso_id]) REFERENCES [dbo].[RSO] ([rso_id]),
+    CONSTRAINT [FK_event_RSO] FOREIGN KEY ([rso_id]) REFERENCES [dbo].[RSO] ([rso_id]) ON DELETE CASCADE,
     CONSTRAINT [FK_event_University] FOREIGN KEY ([uni_id]) REFERENCES [dbo].[University] ([uni_id])
 );
+
+
 
 
 
