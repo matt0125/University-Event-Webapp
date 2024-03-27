@@ -1,6 +1,20 @@
 # University-Event-Webapp
 Database fundamentals term project Spring 2023
 
+## Technologies Used
+C# - ASP.NET Core 6.0 - EF Core, MVC, Dependency Injection
+
+MS SQL Server
+
+## Images
+### Admin view of events
+![Admin view of events](https://github.com/matt0125/University-Event-Webapp/blob/master/Images/Events.png)
+
+### Create location
+Uses Bing Maps API to allow RSO owners to create locations from a pin
+![Create location from map](https://github.com/matt0125/University-Event-Webapp/blob/master/Images/Create%20Location.png)
+
+
 ## Project Description
 Most universities in the country host events around campus and off campus. These events are organized by college students in most cases. Students are clustered RSOs (Registered Student Organizations) by different organizations, clubs, fraternities around campus. These events could be of different types: social, fundraising, tech talks, etc. Now, each university has a website where they post their events for the upcoming weeks. One needs to check the website to add each event to his/her calendar. These events are just official events and not all events around the university are included. Another limitation is that one has no way to track weekly events.
 
@@ -11,8 +25,3 @@ Admin can create events with name, event category, description, time, date, loca
 There are different types of events(social, fundraising, tech talks, etc.). Each event can be public, private, or an RSO event. Public events can be seen by everyone; private events can be seen by the students at the host university; and an RSO events can only be seen by members of the RSO. In addition, events can be created without an RSO (public events). Such events must be approved by the super admin. After an event has been published, users can add, remove, and edit their comments on the event, as well as rating the event on a scale of 1-5 (stars). The application should offer some social network integration, e.g., posting from the application to Facebook or Google.
 
 When logged in, Student should be able to view all public events, private events at their university, and event of RSOs of which they are member. They will not be able to create events, but should be able to rate, comment and edit (update) their comments for any event.
-
-## Technologies Used
-C# - ASP.NET Core 6.0 - EF Core, MVC, Dependency Injection
-
-MS SQL Server
